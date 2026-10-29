@@ -107,6 +107,7 @@ static int an_conn_fd = -1;
    local. Bit N set => device id N is forwarded to fujinet. */
 static unsigned long an_forward_mask =
 (1UL << 0x02) |                                   /* printer            */
+(1UL << 0x03) |                                   /* clock              */
 (1UL << 0x04) | (1UL << 0x05) | (1UL << 0x06) | (1UL << 0x07) | /* disks */
 (1UL << 0x09) | (1UL << 0x0A) | (1UL << 0x0B) |
 (1UL << 0x0C) | (1UL << 0x0D) | (1UL << 0x0E) |   /* network            */
