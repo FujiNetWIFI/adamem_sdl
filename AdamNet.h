@@ -24,7 +24,7 @@ int  AdamNet_Init (int port);
 /* Close listener and any peer connection. */
 void AdamNet_Shutdown (void);
 
-/* 1 if the bridge was initialised (a -fujinet port was given). */
+/* 1 if the bridge was initialized (a -fujinet port was given). */
 int  AdamNet_Enabled (void);
 
 /* Accept a pending fujinet connection if needed; returns 1 if a peer is
@@ -60,9 +60,9 @@ int  AdamNet_ReadBlockReady (int dev, unsigned char *buf /* 1024 */);
 /* Write a 1024-byte block to a block device. */
 int  AdamNet_WriteBlock (int dev, unsigned long block, const unsigned char *buf /* 1024 */);
 
-/* --- Character device (Fuji gateway / network / printer) transactions. ---
+/* --- Character device (Fuji gateway / network / printer / clock) transactions. ---
    EXPERIMENTAL: the DCB-op -> wire mapping for char devices is not yet
-   validated against EOS behaviour; disk + status are the proven path. */
+   validated against EOS behavior; disk + status are the proven path. */
 
 /* Request a char device's status; returns status byte and pending length. */
 int  AdamNet_CharStatus (int dev, unsigned char *status_byte, unsigned *pending_len);

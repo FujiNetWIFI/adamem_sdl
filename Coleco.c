@@ -2962,7 +2962,7 @@ static void UpdateFujiNet (int mode,int dev_id,unsigned DCB)
     RAM[DCB]=0x9B;
   }
  }
- else                                  /* char device (printer/network/Fuji) */
+ else                                  /* char device (printer/clock/network/Fuji) */
  {
   /* EXPERIMENTAL char path; see AdamNet.h. */
   switch (RAM[DCB])
