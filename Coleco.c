@@ -2343,10 +2343,16 @@ void TrashColeco(void)
    else puts ("OK");
   }
  }
- if (RAM) free (RAM);
- if (ROM) free (ROM);
- if (CART) free (CART);
- if (VDP.VRAM) free (VDP.VRAM);
+ /* NULL each pointer after freeing so TrashColeco is idempotent and a fresh
+    StartColeco (same process, e.g. the Android host keeps libadamcore resident
+    across emulator sessions) reallocates instead of reusing a dangling pointer.
+    CART is the critical case: StartColeco only mallocs it when (!CART), so a
+    stale non-NULL CART here would be reused and then double-freed -> the
+    "hardened_malloc: fatal allocator error: invalid free" crash. */
+ if (RAM) { free (RAM); RAM=0; }
+ if (ROM) { free (ROM); ROM=0; }
+ if (CART) { free (CART); CART=0; }
+ if (VDP.VRAM) { free (VDP.VRAM); VDP.VRAM=0; }
  for (i=0;i<4;++i)
  {
   DiskClose (i);
@@ -2981,6 +2987,13 @@ static void UpdateFujiNet (int mode,int dev_id,unsigned DCB)
      if (AdamNet_CharRead (dev,buf,count,&got)==0)
      {
       for (i=0;i<(unsigned)got;++i) RAM[(addr+i)&0xFFFF]=buf[i];
+      /* Write the actual transfer count back into the DCB length field, as
+         the real master 6801 does; clients (e.g. SmartBASIC FujiNet's NFRD)
+         read DCB+3/4 as "bytes transferred" after END_RD_CH. Leaving the
+         requested length here made short packets appear full-sized, so stale
+         buffer tails were consumed as fresh data. */
+      RAM[(DCB+3)&0xFFFF]=got&0xFF;
+      RAM[(DCB+4)&0xFFFF]=(got>>8)&0xFF;
       RAM[DCB]=0x80;
      }
      else RAM[DCB]=0x9B;
@@ -3249,6 +3262,10 @@ static int VDP_Interrupt(void)
  int dorefresh,i;
  /* Increase interrupt count */
  ++numVDPInts;
+#ifdef ADAM_SOUND_QUEUE
+ /* Advance the timestamped sound-command queue's per-frame sample clock. */
+ AdamSoundFrameTick ();
+#endif
  /* Update sound log file */
  if (SoundStream) UpdateSoundStream();
  /* Check for keyboard events */
