@@ -2968,7 +2968,11 @@ static void UpdateFujiNet (int mode,int dev_id,unsigned DCB)
   switch (RAM[DCB])
   {
    case 1:                              /* status                             */
-    if (AdamNet_CharStatus (dev,&st,NULL)==0) RAM[DCB]=0x80;
+    if (AdamNet_CharStatus (dev,&st,NULL)==0)
+    {
+     RAM[DCB]=0x80;
+     RAM[(DCB+20)&0xFFFF]=st;
+    }
     else RAM[DCB]=0x9B;
     break;
    case 3:                              /* write                              */
